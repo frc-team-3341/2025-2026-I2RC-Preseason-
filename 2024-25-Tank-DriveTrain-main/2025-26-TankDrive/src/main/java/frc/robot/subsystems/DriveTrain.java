@@ -28,21 +28,20 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-import com.kauailabs.navx.frc.AHRS;
+import com.studica.frc.AHRS;
+import com.studica.frc.AHRS.NavXComType;
 
 public class DriveTrain extends SubsystemBase {
   private final WPI_TalonSRX leftDriveTalon;
   private final WPI_TalonSRX rightDriveTalon;
 
-  private TalonSRXSimCollection leftDriveSim;
-  private TalonSRXSimCollection rightDriveSim;
 
   // code for simulating robot pose
   private Field2d m_field = new Field2d();
   private DifferentialDriveOdometry m_odometry;
   private final DifferentialDrivetrainSim driveSim;
 
-  private AHRS navx = new AHRS(SPI.Port.kMXP);
+  private AHRS navx = new AHRS(NavXComType.kMXP_SPI);
 
   private ShuffleboardTab DTTab = Shuffleboard.getTab("DriveTrain");
   private GenericEntry LeftVoltage = DTTab.add("Left Output Percent", 0.0).getEntry();
@@ -67,8 +66,6 @@ public class DriveTrain extends SubsystemBase {
     rightDriveTalon.configFactoryDefault();
     rightDriveTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
 
-    leftDriveSim = leftDriveTalon.getSimCollection();
-    rightDriveSim = rightDriveTalon.getSimCollection();
 
     final double KvLinear = 2.98;
     final double KaLinear = 0.2;
