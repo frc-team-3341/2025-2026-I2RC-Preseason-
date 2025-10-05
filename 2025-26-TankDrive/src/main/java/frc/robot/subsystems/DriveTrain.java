@@ -8,18 +8,24 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.TalonSRXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.studica.frc.AHRS;
+import com.studica.frc.AHRS.NavXComType;
+import edu.wpi.first.math.geometry.Rotation3d;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
@@ -28,9 +34,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-import com.studica.frc.AHRS;
-import com.studica.frc.AHRS.NavXComType;
-
 public class DriveTrain extends SubsystemBase {
   private final WPI_TalonSRX leftDriveTalon;
   private final WPI_TalonSRX rightDriveTalon;
@@ -38,6 +41,14 @@ public class DriveTrain extends SubsystemBase {
 
   // code for simulating robot pose
   private Field2d m_field = new Field2d();
+  private final Pose3d poseB = new Pose3d(); // You can leave this as a placeholder or set it later
+
+  private final StructPublisher<Pose3d> posePublisher = NetworkTableInstance.getDefault()
+  .getStructTopic("/AdvantageScope/Robot", Pose3d.struct) // special name
+  .publish();
+
+private final StructArrayPublisher<Pose3d> poseArrayPublisher = NetworkTableInstance.getDefault()
+    .getStructArrayTopic("MyPoseArray", Pose3d.struct).publish();
   private DifferentialDriveOdometry m_odometry;
   private final DifferentialDrivetrainSim driveSim;
 
@@ -55,8 +66,8 @@ public class DriveTrain extends SubsystemBase {
     leftDriveTalon.setNeutralMode(NeutralMode.Coast);
     rightDriveTalon.setNeutralMode(NeutralMode.Coast);
 
-    leftDriveTalon.setInverted(false);
-    rightDriveTalon.setInverted(true);
+    leftDriveTalon.setInverted(true);
+    rightDriveTalon.setInverted(false);
 
     leftDriveTalon.setSensorPhase(true);
     rightDriveTalon.setSensorPhase(true);
@@ -140,19 +151,36 @@ public class DriveTrain extends SubsystemBase {
   }
 
   @Override
-  public void simulationPeriodic(){
+public void simulationPeriodic() {
     SmartDashboard.putNumber("Left Sim Pos", driveSim.getLeftPositionMeters());
     SmartDashboard.putNumber("Right Sim Pos", driveSim.getRightPositionMeters());
 
-    //update encoder and gyros
+    // Update encoder and gyro positions
     leftDriveTalon.setSelectedSensorPosition(metersToTicks(driveSim.getLeftPositionMeters()), 0, 10);
     rightDriveTalon.setSelectedSensorPosition(metersToTicks(driveSim.getRightPositionMeters()), 0, 10);
 
-    // update robot pose
-    driveSim.update(0.02);
+    // Update drivetrain simulation
     driveSim.setInputs(leftDriveTalon.getMotorOutputVoltage(), rightDriveTalon.getMotorOutputVoltage());
-    m_odometry.update(new Rotation2d(driveSim.getHeading().getRadians()), driveSim.getLeftPositionMeters(),driveSim.getRightPositionMeters());
-    // m_odometry.update(m_gyro.getRotation2d(),m_leftEncoder.getDistance(),m_rightEncoder.getDistance());
+    driveSim.update(0.02);
+
+    // Update odometry with the simulated drivetrain state
+    m_odometry.update(
+        new Rotation2d(driveSim.getHeading().getRadians()),
+        driveSim.getLeftPositionMeters(),
+        driveSim.getRightPositionMeters()
+    );
+
     m_field.setRobotPose(m_odometry.getPoseMeters());
-  }
+
+    // --- Publish Pose3d to NetworkTables for visualization ---
+    Pose2d currentPose2d = m_odometry.getPoseMeters();
+Rotation3d rot3d = new Rotation3d(0.0, 0.0, currentPose2d.getRotation().getRadians());
+Pose3d currentPose3d = new Pose3d(
+    new Translation3d(currentPose2d.getX(), currentPose2d.getY(), 0.0),
+    rot3d
+);
+
+posePublisher.set(currentPose3d);
+poseArrayPublisher.set(new Pose3d[] { currentPose3d, poseB });
+}
 }
