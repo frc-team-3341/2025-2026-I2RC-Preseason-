@@ -41,7 +41,8 @@ public class DriveTrain extends SubsystemBase {
   private final WPI_TalonSRX leftDriveTalon;
   private final WPI_TalonSRX rightDriveTalon;
 
-  private double speed;
+
+  public double speed;
 
 
   // code for simulating robot pose
@@ -155,6 +156,7 @@ private final StructArrayPublisher<Pose3d> poseArrayPublisher = NetworkTableInst
     SmartDashboard.putNumber("Right Output Percent", rightDriveTalon.getMotorOutputPercent());
     SmartDashboard.putNumber("Right Output Voltage", rightDriveTalon.getMotorOutputVoltage());
     SmartDashboard.putNumber("Angle", navx.getAngle());
+    SmartDashboard.putNumber("Current Speed", speed);
 
     LeftVoltage.setDouble(leftDriveTalon.getMotorOutputPercent());
     RightVoltage.setDouble(rightDriveTalon.getMotorOutputPercent());

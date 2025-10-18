@@ -4,6 +4,10 @@
 
 package frc.robot.commands;
 
+import java.util.function.DoubleSupplier;
+
+import com.ctre.phoenix6.controls.StaticBrake;
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -12,13 +16,11 @@ import frc.robot.subsystems.DriveTrain;
 public class TankDrive extends Command {
   public DriveTrain dt;
   public Joystick joy;
-  public double speed;
-
   /** Creates a new TankDrive. */
   public TankDrive(DriveTrain dt, Joystick j) {
     this.dt = dt;
     this.joy = j;
-    speed = 0.7;
+    dt.speed = 0.7;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(dt);
@@ -39,7 +41,7 @@ public class TankDrive extends Command {
 
     double rightPowerRaw = joy.getRawAxis(5);
 
-    dt.tankDrive(leftPowerRaw*-speed, rightPowerRaw*-speed);
+    dt.tankDrive(leftPowerRaw*-dt.speed, rightPowerRaw*-dt.speed);
   }
 
 
@@ -57,7 +59,23 @@ public class TankDrive extends Command {
 
   public Command increaseSpeed(double increment) {
     return dt.runOnce(() -> {
-      speed += increment;
+      if (dt.speed<1.2){
+        dt.speed += increment;
+      }
+      
     });
+  }
+
+  public Command decreaseSpeed(double increment){
+    return dt.runOnce(() -> {
+      if (dt.speed>0.45){
+        dt.speed -= increment;
+      } 
+
+    });
+  }
+
+  public double returnSpeed(){
+    return dt.speed;
   }
 }

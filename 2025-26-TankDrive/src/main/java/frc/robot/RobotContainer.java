@@ -28,6 +28,7 @@ public class RobotContainer {
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final Joystick joy1 = new Joystick(Constants.USBOrder.Zero);
   JoystickButton increaseSpeedButton = new JoystickButton(joy1, 1);
+  JoystickButton decreaseSpeedButton = new JoystickButton(joy1, 2);
 
 
   private final DriveTrain dt = new DriveTrain();
@@ -58,9 +59,9 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-      increaseSpeedButton.onTrue(tankDrive.increaseSpeed(0.5));
+      increaseSpeedButton.onTrue(tankDrive.increaseSpeed(0.25));
+      decreaseSpeedButton.onTrue(tankDrive.decreaseSpeed(0.25));
   }
-
   
 
   /**
