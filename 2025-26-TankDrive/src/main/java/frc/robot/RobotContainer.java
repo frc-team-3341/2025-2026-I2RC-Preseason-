@@ -7,9 +7,12 @@ package frc.robot;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
@@ -24,6 +27,8 @@ public class RobotContainer {
   
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final Joystick joy1 = new Joystick(Constants.USBOrder.Zero);
+  JoystickButton increaseSpeedButton = new JoystickButton(joy1, 1);
+
 
   private final DriveTrain dt = new DriveTrain();
 
@@ -34,6 +39,7 @@ public class RobotContainer {
   private final Autodrive autodrive = new Autodrive(dt, setpoint);
 
   private final PIDTurn pidTurn = new PIDTurn(dt, 90.0);
+
   
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -52,8 +58,10 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
- 
+      increaseSpeedButton.onTrue(tankDrive.increaseSpeed(0.5));
   }
+
+  
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

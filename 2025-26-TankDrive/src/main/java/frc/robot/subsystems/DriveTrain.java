@@ -6,6 +6,8 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -31,12 +33,15 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class DriveTrain extends SubsystemBase {
   private final WPI_TalonSRX leftDriveTalon;
   private final WPI_TalonSRX rightDriveTalon;
+
+  private double speed;
 
 
   // code for simulating robot pose
@@ -77,6 +82,8 @@ private final StructArrayPublisher<Pose3d> poseArrayPublisher = NetworkTableInst
     rightDriveTalon.configFactoryDefault();
     rightDriveTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
 
+    speed = 0;
+
 
     final double KvLinear = 2.98;
     final double KaLinear = 0.2;
@@ -111,6 +118,7 @@ private final StructArrayPublisher<Pose3d> poseArrayPublisher = NetworkTableInst
     leftDriveTalon.set(leftSpeed);
   }
 
+
   public void resetEncoders() {
     leftDriveTalon.setSelectedSensorPosition(0, 0, 10);
     rightDriveTalon.setSelectedSensorPosition(0, 0, 10);
@@ -138,8 +146,10 @@ private final StructArrayPublisher<Pose3d> poseArrayPublisher = NetworkTableInst
     navx.reset();
   }
 
+
   @Override
   public void periodic() {
+    
     SmartDashboard.putNumber("Left Output Percent", leftDriveTalon.getMotorOutputPercent());
     SmartDashboard.putNumber("Left Output Voltage", leftDriveTalon.getMotorOutputVoltage());
     SmartDashboard.putNumber("Right Output Percent", rightDriveTalon.getMotorOutputPercent());
