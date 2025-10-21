@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
@@ -24,6 +25,9 @@ public class RobotContainer {
   
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final Joystick joy1 = new Joystick(Constants.USBOrder.Zero);
+  JoystickButton b1=new JoystickButton(joy1, 1);
+  JoystickButton b2=new JoystickButton(joy1, 2);
+
 
   private final DriveTrain dt = new DriveTrain();
 
@@ -52,7 +56,8 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
- 
+    b1.onTrue(tankDrive.buttonPressed());
+    b2.onTrue(tankDrive.buttonPressed());
   }
 
   /**
@@ -73,4 +78,5 @@ public class RobotContainer {
       new Autodrive(dt, 1.0)
       );*/
   }
+  
 }
