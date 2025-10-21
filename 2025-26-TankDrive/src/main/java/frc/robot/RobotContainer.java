@@ -27,6 +27,9 @@ public class RobotContainer {
   private final Joystick joy1 = new Joystick(Constants.USBOrder.Zero);
   JoystickButton b1=new JoystickButton(joy1, 1);
   JoystickButton b2=new JoystickButton(joy1, 2);
+  JoystickButton bumperL=new JoystickButton(joy1, 5);
+  JoystickButton bumperR=new JoystickButton(joy1, 6);
+
 
 
   private final DriveTrain dt = new DriveTrain();
@@ -56,8 +59,10 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    b1.onTrue(tankDrive.buttonPressed());
-    b2.onTrue(tankDrive.buttonPressed());
+    b1.whileTrue(tankDrive.buttonPressed());
+    b2.whileTrue(tankDrive.buttonPressed2());
+    bumperR.whileTrue(tankDrive.TurnRight());
+    bumperL.whileTrue(tankDrive.TurnLeft());
   }
 
   /**

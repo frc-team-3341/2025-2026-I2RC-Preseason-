@@ -38,12 +38,9 @@ public class TankDrive extends Command {
 
     double rightPowerRaw = joy.getRawAxis(5);
     
-    if(joy.getRawButton(3)){
+    /*if(joy.getRawButton(3)){
       dt.tankDrive(0.7, 0.7);
-    }
-    if (joy.getRawButton(4)){
-      dt.speed=0.3;
-    }
+    }*/
     if (!joy.getRawButton(3)){
       dt.tankDrive(leftPowerRaw*-1, rightPowerRaw*-1);
     }
@@ -63,12 +60,22 @@ public class TankDrive extends Command {
   }
   public Command buttonPressed(){
     return dt.runOnce(()->{
-      dt.speed=0.7;
+      dt.speed=0.9;
     });
   }
   public Command buttonPressed2(){
     return dt.runOnce(()->{
       dt.speed=0.3;
+    });
+  }
+  public Command TurnRight(){
+    return dt.run(()->{
+      dt.tankDrive(1, -1);
+    });
+  }
+  public Command TurnLeft(){
+    return dt.run(()->{
+      dt.tankDrive(-1, 1);
     });
   }
   /*public Command buttonNotPressed(){
