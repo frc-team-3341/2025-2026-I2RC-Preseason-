@@ -36,15 +36,21 @@ public class TankDrive extends Command {
   public void execute() {
     double leftPowerRaw = joy.getRawAxis(1);
 
-    double rightPowerRaw = joy.getRawAxis(5);
+    //double rightPowerRaw = joy.getRawAxis(5);
     
+    double forwardPowerRaw = joy.getRawAxis(0);
+
+    double speedR=forwardPowerRaw+(leftPowerRaw*0.5)/1.5;
+
+    double speedL=forwardPowerRaw-(leftPowerRaw*0.5)/1.5;
+
+    dt.tankDrive(speedR, speedL);
+
     /*if(joy.getRawButton(3)){
       dt.tankDrive(0.7, 0.7);
     }*/
-    if (!joy.getRawButton(3)){
-      dt.tankDrive(leftPowerRaw*-1, rightPowerRaw*-1);
-    }
-    
+
+    //dt.tankDrive(leftPowerRaw*-1, rightPowerRaw*-1);    
   }
 
   // Called once the command ends or is interrupted.
